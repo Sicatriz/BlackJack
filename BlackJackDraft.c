@@ -1,6 +1,6 @@
 /*
 * [Pas deze hoofding aan]
-* Author(s): Gilissen Koen & Swinkels Wout
+* Author(s): Benjie Vanlimbergen & Miguel Nunez
 * Date: 1/11/2021
 * Description: Start code voor blackjack spel
 */
