@@ -33,6 +33,7 @@ int restart();
 int winst();
 int verlies();
 int nieuw();
+int kaartBij();
 void printIntro(void);
 
 char voorNaam[20] = "player";
@@ -63,10 +64,10 @@ int main(void)
 	printf("Geef uw voornaam in: \n");
 	scanf("%s", &voorNaam);
 
+	startGame:
 	//print het aantal beschikbare credits, vraagt naar gewenste inzet en verrekend deze.
 	stack();
 
-	startGame:
 	// delen van eerste 2 spelerskaarten.
 	for(int i = 0; i < 2; i++)
 		{
@@ -91,10 +92,8 @@ int main(void)
 
 	// indien de speler meteen een BLACKJACK getrokken heeft en de ronde wint.
 	if (totaalSpeler == 21) {
-			printf("U heeft een BLACKJACK en heeft %.2f credits GEWONNEN\n", inzet + (inzet*1.5));
-
-			// verreken de inzet en totaal credits.
-			credits = credits + inzet + (inzet*1.5);
+			printf("BLACKJACK!!! " );
+			winst();
 
 			// print stand credits en vraagt naar nieuw spel of stoppen.
 			nieuw();
@@ -143,70 +142,87 @@ int main(void)
 			}
 	}
 
-	// wilt de speler nog een kaart bij.
-	do {
-    printf("Wenst U een nieuw kaart te hitten? Y of N ");
-		scanf(" %c", &hit);
-		} while (hit != 'y' && hit != 'n');
+		// wilt de speler nog een kaart bij.
+		kaartBij();
 
-			if (hit == 'n') {
-				stand == 'y';
-			}
-
-	// y == speler wilt een kaart bij.
-	do {
+		// als de speler een kaart bij wilt, blijven geven tot bust of stand
 		if (hit == 'y') {
 
-			//KAART SPELER
-			// Speler actief en krijgt kaarten.
-			actief = 'S';
-			kaartPunt = geefKaart();
+				while (stand != 'y') {
 
-			// waardebepaling indien de SPELER een AAS trekt.
-			if (kaartPunt == 1) {
-				kaartPunt = waardeAas();
-			}
+					//KAART SPELER
+					// Speler actief en krijgt kaarten.
+					actief = 'S';
+					kaartPunt = geefKaart();
 
-			// scoreberekening spelershand na startkaarten.
-			kaartPuntSpeler = kaartPunt;
-			kaartPunt = 0;
-			totaalSpeler = kaartPuntSpeler + totaalSpeler;
+					// waardebepaling indien de SPELER een AAS trekt.
+					if (kaartPunt == 1) {
+						kaartPunt = waardeAas();
+					}
 
-			// print de handscore van de speler.
-			printf("\nU heeft nu %d punten in de hand\n\n", totaalSpeler);
+					// scoreberekening spelershand na startkaarten.
+					kaartPuntSpeler = kaartPunt;
+					kaartPunt = 0;
+					totaalSpeler = kaartPuntSpeler + totaalSpeler;
 
-			// ----------------
+					// print de handscore van de speler.
+					printf("\nU heeft nu %d punten in de hand\n\n", totaalSpeler);
 
-			if (totaalHouse > 17 && totaalHouse < 22) {
-				printf("Vanaf 17 punten stopt het huis.\n" );
-			} else {
-				//KAART HOUSE
-				// HOUSE actief en krijgt kaarten.
-				actief = 'H';
-				kaartPunt = geefKaart();
+					// ----------------
 
-				// waardebepaling indien de HOUSE een AAS trekt.
-				if (kaartPunt == 1) {
-					kaartPunt = waardeAas();
+					// HUIS past vanaf 17 OF HUIS BUST OF spel loopt verder
+					if (totaalHouse > 16 && totaalHouse < 22) {
+						printf("HUIS past met %d punten.\n", totaalHouse );
+					}	else {
+						//KAART HOUSE
+						// HOUSE actief en krijgt kaarten.
+						actief = 'H';
+						kaartPunt = geefKaart();
+							// waardebepaling indien de HOUSE een AAS trekt.
+						if (kaartPunt == 1) {
+							kaartPunt = waardeAas();
+						}
+						// scoreberekening HOUSEhand na startkaarten.
+						kaartPuntHouse = kaartPunt;
+						kaartPunt = 0;
+						totaalHouse = kaartPuntHouse + totaalHouse;
+					}
+						// print de handscore van HOUSE.
+						printf("\nHet huis heeft nu %d punten in de hand\n", totaalHouse);
+
+						//Speler heeft > 21 en is BUST.
+						if (totaalSpeler > 21) {
+							printf("U heeft meer dan 21 en bent BUST!\n");
+							verlies();
+							stand = 'y';
+
+						} else if (totaalHouse > 21 && totaalSpeler < 22) {
+								printf("Het HUIS is BUST met %d punten.\n", totaalHouse );
+								winst();
+						} else {
+							kaartBij();
+							if (hit == 'n') {
+								stand == 'y';
+								winnaar();
+							}
+
+						}
+
+						nieuw();
+						if (new == 'y') {
+							restart();
+							goto startGame;
+						}  else {
+							goto end;
+						}
+
 				}
-				// scoreberekening HOUSEhand na startkaarten.
-				kaartPuntHouse = kaartPunt;
-				kaartPunt = 0;
-				totaalHouse = kaartPuntHouse + totaalHouse;
-			}
-			// print de handscore van HOUSE.
-			printf("\nHet huis heeft nu %d punten in de hand\n", totaalHouse);
 
-		} else {
-			/* code */
+
+
+
+
 		}
-
-
-
-
-	} while(stand != 'y');
-
-
 
 
 
@@ -218,6 +234,27 @@ int main(void)
 		printf("nog verder af te werken\n");
 }
 
+//hit or stand vraag
+int kaartBij()
+{
+	do {
+		printf("Wenst U een nieuw kaart te hitten? Y of N ");
+		scanf(" %c", &hit);
+		} while (hit != 'y' && hit != 'n');
+		return 0;
+}
+
+
+int winnaar()
+{
+	if (totaalSpeler > totaalHouse && totaalSpeler < 22) {
+		winst();
+	} else {
+		verlies();
+	}
+	return 0;
+}
+
 //Nieuw spel Y/N
 int nieuw()
 {
@@ -226,20 +263,25 @@ int nieuw()
 		printf("Wenst U een nieuwe ronde te spelen? Y of N ");
 		scanf(" %c", &new);
 	} while (new != 'y' && new != 'n');
-	scanf("%s", &new );
+
+	return 0;
 }
 
 //Feedback WINST
+// verreken de inzet en totaal credits.
 int winst()
 {
-
-
+	credits = credits + inzet + (inzet*1.5);
+	printf("U heeft %.2lf credits GEWONNEN!\n", (inzet*1.5));
+	return 0;
+return 0;
 }
 
 //Feedback VERLOREN
 int verlies()
 {
 	printf("U heeft VERLOREN!\n");
+	return 0;
 }
 
 // reset waardes voor een nieuw spel.
@@ -587,3 +629,4 @@ void printIntro(void)
 
 	printf("<< Uitleg voeg je hier toe\n");
 }
+
