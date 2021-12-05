@@ -1,6 +1,6 @@
 /*
-* Author(s): Gilissen Koen & Swinkels Wout
-* Date: 1/11/2021
+* Author(s): Benjie Vanlimbergen & Miguel Nunez
+* Date: 6/12/2021
 * Description: Start code voor blackjack spel
 */
 
@@ -29,7 +29,10 @@ int kaart13();
 int randomKaart();
 int waardeAas();
 int stack();
-int opnieuw();
+int restart();
+int winst();
+int verlies();
+int nieuw();
 void printIntro(void);
 
 char voorNaam[20] = "player";
@@ -47,6 +50,7 @@ double inzet = 0;
 char actief = 'S';
 char new = 'x';
 char hit = 'x';
+char stand = 'x';
 
 int main(void)
 {
@@ -55,9 +59,11 @@ int main(void)
 	//Welkomstscherm & speluitleg
   printIntro();
 
-	//naam en inzet bepaling
+	//naam speler opslaan.
 	printf("Geef uw voornaam in: \n");
 	scanf("%s", &voorNaam);
+
+	//print het aantal beschikbare credits, vraagt naar gewenste inzet en verrekend deze.
 	stack();
 
 	startGame:
@@ -75,6 +81,7 @@ int main(void)
 
 			// scoreberekening spelershand na startkaarten.
 			kaartPuntSpeler = kaartPunt;
+			printf("KPS %d\n",kaartPuntSpeler );
 			kaartPunt = 0;
 			totaalSpeler = kaartPuntSpeler + totaalSpeler;
 		}
@@ -88,13 +95,11 @@ int main(void)
 
 			// verreken de inzet en totaal credits.
 			credits = credits + inzet + (inzet*1.5);
-			printf("Uw nieuw saldo is %.2lf credits.\n", credits );
 
 			// print stand credits en vraagt naar nieuw spel of stoppen.
-			printf("Wenst U een nieuwe ronde op te starten? Y of N\n\n", credits );
-			scanf("%s", &new );
+			nieuw();
 			if (new == 'y') {
-			opnieuw();
+			restart();
 			goto startGame;
 			}  else {
 			goto end;
@@ -115,6 +120,7 @@ int main(void)
 			}
 			// scoreberekening HOUSEhand na startkaarten.
 			kaartPuntHouse = kaartPunt;
+			printf("KPH %d\n",kaartPuntHouse );
 			kaartPunt = 0;
 			totaalHouse = kaartPuntHouse + totaalHouse;
 
@@ -124,18 +130,81 @@ int main(void)
 
 	// indien HOUSE meteen een BLACKJACK getrokken heeft (speler niet) en HOUSE wint de ronde.
 	if (totaalHouse == 21) {
-			printf("Het Huis heeft een BLACKJACK, U heeft VERLOREN!\n");
+			printf("Het Huis heeft een BLACKJACK! ");
 			// print stand credits en vraagt naar nieuw spel of stoppen.
-			printf("Uw saldo is %.2lf credits.");
-			printf("Wenst U een nieuwe ronde op te starten? Y of N\n\n", credits );
-			scanf("%s", &new );
+			verlies();
+			// print stand credits en vraagt naar nieuw spel of stoppen.
+			nieuw();
 			if (new == 'y') {
-			opnieuw();
-			goto startGame;
+				restart();
+				goto startGame;
 			}  else {
-			goto end;
+				goto end;
 			}
 	}
+
+	// wilt de speler nog een kaart bij.
+	do {
+    printf("Wenst U een nieuw kaart te hitten? Y of N ");
+		scanf(" %c", &hit);
+		} while (hit != 'y' && hit != 'n');
+
+			if (hit == 'n') {
+				stand == 'y';
+			}
+
+	// y == speler wilt een kaart bij.
+	do {
+		if (hit == 'y') {
+
+			//KAART SPELER
+			// Speler actief en krijgt kaarten.
+			actief = 'S';
+			kaartPunt = geefKaart();
+
+			// waardebepaling indien de SPELER een AAS trekt.
+			if (kaartPunt == 1) {
+				kaartPunt = waardeAas();
+			}
+
+			// scoreberekening spelershand na startkaarten.
+			kaartPuntSpeler = kaartPunt;
+			kaartPunt = 0;
+			totaalSpeler = kaartPuntSpeler + totaalSpeler;
+
+			// print de handscore van de speler.
+			printf("\nU heeft nu %d punten in de hand\n\n", totaalSpeler);
+
+			// ----------------
+
+			if (totaalHouse > 17 && totaalHouse < 22) {
+				printf("Vanaf 17 punten stopt het huis.\n" );
+			} else {
+				//KAART HOUSE
+				// HOUSE actief en krijgt kaarten.
+				actief = 'H';
+				kaartPunt = geefKaart();
+
+				// waardebepaling indien de HOUSE een AAS trekt.
+				if (kaartPunt == 1) {
+					kaartPunt = waardeAas();
+				}
+				// scoreberekening HOUSEhand na startkaarten.
+				kaartPuntHouse = kaartPunt;
+				kaartPunt = 0;
+				totaalHouse = kaartPuntHouse + totaalHouse;
+			}
+			// print de handscore van HOUSE.
+			printf("\nHet huis heeft nu %d punten in de hand\n", totaalHouse);
+
+		} else {
+			/* code */
+		}
+
+
+
+
+	} while(stand != 'y');
 
 
 
@@ -149,10 +218,32 @@ int main(void)
 		printf("nog verder af te werken\n");
 }
 
+//Nieuw spel Y/N
+int nieuw()
+{
+	printf("Uw huidig saldo bedraagd %.2lf credits ", credits );
+	do {
+		printf("Wenst U een nieuwe ronde te spelen? Y of N ");
+		scanf(" %c", &new);
+	} while (new != 'y' && new != 'n');
+	scanf("%s", &new );
+}
 
+//Feedback WINST
+int winst()
+{
+
+
+}
+
+//Feedback VERLOREN
+int verlies()
+{
+	printf("U heeft VERLOREN!\n");
+}
 
 // reset waardes voor een nieuw spel.
-int opnieuw()
+int restart()
 {
 		kaartPuntSpeler = 0;
 		kaartPuntHouse = 0;
@@ -163,6 +254,7 @@ int opnieuw()
 		aceHouse = 0;
 		new = 'x';
 		hit = 'x';
+		stand = 'x';
 
 		return 0;
 }
