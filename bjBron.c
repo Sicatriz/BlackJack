@@ -50,7 +50,8 @@ double credits = 10;
 double inzet = 0;
 char actief = 'S';
 char new = 'x';
-char hit = 'x';
+int hit = 2;
+char hitc = 'x';
 char stand = 'x';
 
 int main(void)
@@ -146,7 +147,9 @@ int main(void)
 		kaartBij();
 
 		// als de speler een kaart bij wilt, blijven geven tot bust of stand
-		if (hit == 'y') {
+		if (hit == 1) {
+				//reset hit
+				hit = 2;
 
 				while (stand != 'y') {
 
@@ -160,7 +163,7 @@ int main(void)
 						kaartPunt = waardeAas();
 					}
 
-					// scoreberekening spelershand na startkaarten.
+					// scoreberekening spelershand na kaarten.
 					kaartPuntSpeler = kaartPunt;
 					kaartPunt = 0;
 					totaalSpeler = kaartPuntSpeler + totaalSpeler;
@@ -181,14 +184,16 @@ int main(void)
 							// waardebepaling indien de HOUSE een AAS trekt.
 						if (kaartPunt == 1) {
 							kaartPunt = waardeAas();
+
+							// scoreberekening HOUSEhand na startkaarten.
+							kaartPuntHouse = kaartPunt;
+							kaartPunt = 0;
+							totaalHouse = kaartPuntHouse + totaalHouse;
 						}
-						// scoreberekening HOUSEhand na startkaarten.
-						kaartPuntHouse = kaartPunt;
-						kaartPunt = 0;
-						totaalHouse = kaartPuntHouse + totaalHouse;
-					}
 						// print de handscore van HOUSE.
 						printf("\nHet huis heeft nu %d punten in de hand\n", totaalHouse);
+					}
+
 
 						//Speler heeft > 21 en is BUST.
 						if (totaalSpeler > 21) {
@@ -200,8 +205,9 @@ int main(void)
 								printf("Het HUIS is BUST met %d punten.\n", totaalHouse );
 								winst();
 						} else {
+
 							kaartBij();
-							if (hit == 'n') {
+							if (hit == 0) {
 								stand == 'y';
 								winnaar();
 							}
@@ -218,11 +224,7 @@ int main(void)
 
 				}
 
-
-
-
-
-		}
+		} else { printf("N getypt voor hit\n");}
 
 
 
@@ -237,10 +239,18 @@ int main(void)
 //hit or stand vraag
 int kaartBij()
 {
+	hit = 2;
+	hitc = 'x';
 	do {
 		printf("Wenst U een nieuw kaart te hitten? Y of N ");
-		scanf(" %c", &hit);
-		} while (hit != 'y' && hit != 'n');
+		scanf("%c", &hitc);
+	} while (hitc != 'y' && hitc != 'n');
+
+	if (hitc == 'y') {
+		hit = 1;
+	} else if (hitc == 'n') {
+		hit = 0;
+	}else { printf("oeps...\n");}
 		return 0;
 }
 
@@ -258,10 +268,11 @@ int winnaar()
 //Nieuw spel Y/N
 int nieuw()
 {
+	new = 'x';
 	printf("Uw huidig saldo bedraagd %.2lf credits ", credits );
 	do {
 		printf("Wenst U een nieuwe ronde te spelen? Y of N ");
-		scanf(" %c", &new);
+		scanf("%c", &new);
 	} while (new != 'y' && new != 'n');
 
 	return 0;
@@ -295,7 +306,8 @@ int restart()
 		aceSpeler = 0;
 		aceHouse = 0;
 		new = 'x';
-		hit = 'x';
+		hitc = 'x';
+		hit = 2;
 		stand = 'x';
 
 		return 0;
@@ -327,7 +339,7 @@ int waardeAas(kaartPunt)
 			aceSpeler = 1;
 		} else if (aceSpeler == 1 && totaalSpeler < 11) {
 			kaartPunt = 11;	} else {
-			kaartPunt == 1;}
+			kaartPunt = 1;}
 	}	else if (actief == 'H') {
 		if (aceHouse == 0 && totaalHouse <11) {
 			kaartPunt = 11;
@@ -337,7 +349,7 @@ int waardeAas(kaartPunt)
 			aceHouse = 1;
 		} else if (aceHouse == 1 && totaalHouse < 11) {
 			kaartPunt = 11;	} else {
-			kaartPunt == 1;}
+			kaartPunt = 1;}
 	}
 	return kaartPunt;
 }
@@ -629,4 +641,3 @@ void printIntro(void)
 
 	printf("<< Uitleg voeg je hier toe\n");
 }
-
