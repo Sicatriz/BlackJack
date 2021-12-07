@@ -55,21 +55,27 @@ int actief = 0;
     //speler krijgt starthand en print punten.
     kpSpeler = deelStartKaarten();
     printf("\nHandwaarde SPELER = %d\n", kpSpeler);
-    if (kpSpeler == 21)
-    {
-        actief = 1;
-        blackJack(actief);
-    }
-    
-
-
+        if (kpSpeler == 21)
+        {
+            actief = 1;
+            blackJack(actief);
+            actief = 0;
+        }
 
     //House krijgt starthand en print punten.
     kpHouse = deelStartKaarten();
     printf("\nHandwaarde HOUSE = %d\n", kpHouse);
+        if (kpHouse == 21)
+        {
+            actief = 2;
+            blackJack(actief);
+            actief = 0;
+        }
 
 
 }
+
+
 
 //Hand maakt blackjack
 int blackJack(actief)
