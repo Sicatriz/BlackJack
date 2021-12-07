@@ -59,7 +59,7 @@ int actief = 0;
         {
             actief = 1;
             blackJack(actief);
-            actief = 0;
+            printf("actief = %d", actief);
         }
 
     //House krijgt starthand en print punten.
@@ -69,7 +69,7 @@ int actief = 0;
         {
             actief = 2;
             blackJack(actief);
-            actief = 0;
+            printf("actief = %d", actief);
         }
 
 
@@ -86,7 +86,7 @@ int blackJack(actief)
         printf("BLACKJACK!!! U heeft GEWONNEN!!!");
         break;
 
-     case 2:
+    case 2:
         printf("HOUSE heeft blackjack, U heeft VERLOREN...");
         break;
     
@@ -94,6 +94,7 @@ int blackJack(actief)
         printf("Er is geen actieve speler ...");
         break;
     }
+    return 0;
 }
 
 // deelt startkaarten
