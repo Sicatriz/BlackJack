@@ -31,9 +31,11 @@ int deelStartKaarten();
 int waardeAas();
 int blackJack();
 int kaartBij();
+int kaartBijHouse();
 int deelNieuweKaart();
 void gewonnen();
 void verloren();
+int checkHandWaarde();
 
 int main(void)
 {
@@ -43,6 +45,9 @@ int kpSpeler = 0;
 int kpHouse = 0;
 // actief 0 = neutraal, actief 1 = SPELER, actief 2 = HOUSE
 int actief = 0;
+char hit = 'x';
+char result = 'x';
+int giveMe = 2;
 
 	srand(time(NULL));
 
@@ -53,57 +58,133 @@ int actief = 0;
     //naam speler opslaan.
 	printf("\nGeef uw voornaam in: \n");
 	gets(voorNaam);
-    printf("\n");
     system("cls");
-    printf("Dag %s , succes met het spel!.\n\n Uw starthand is : \n\n", voorNaam);
+//    printf("Dag %s , succes met het spel!.\n\n Uw starthand is : \n\n", voorNaam);
 
     //speler krijgt starthand en print punten.
-    kpSpeler = deelStartKaarten();
-    printf("\nHandwaarde SPELER = %d\n", kpSpeler);
+    printf("* * * * * * * * * * * *\nKaarten %s\n* * * * * * * * * * * *\n", voorNaam);
+    kpSpeler = deelStartKaarten(kpSpeler);
+//    printf("\nHandwaarde SPELER = %d\n", kpSpeler);
+        
 
     //House krijgt starthand en print punten.
-    kpHouse = deelStartKaarten();
-    printf("\nHandwaarde HOUSE = %d\n", kpHouse);
+    printf("\n* * * * * * * * * * * *\nKaarten HOUSE\n* * * * * * * * * * * *\n");
+    kpHouse = deelStartKaarten(kpHouse);
+//    printf("\nHandwaarde HOUSE = %d\n", kpHouse);
+        
+    printf("\nSPELER %d vs HOUSE %d\n", kpSpeler, kpHouse);
 
         //controle op Blackjacks
         if (kpSpeler == 21)
         {
             actief = 1;
             actief = blackJack(actief);
+            return 0;
         }
         else if (kpHouse == 21)
         {
             actief = 2;
             actief = blackJack(actief);
             printf("actief = %d\n", actief);
+            return 0;
         }
-        else
-        {
-                //kaart bijvragen of niet.
-                kpSpeler = kpSpeler + kaartBij();
-                printf("\nHandwaarde SPELER = %d\n", kpSpeler);
-        }
+                
 
-}
-
-//kaart bijvragen
-int kaartBij(int puntTotaal)
-{
-char hit = 'x';
-char result = 'x';
-
+    //kaart bijvragen of niet. (giveMe 0 = N ||  giveMe 1 = Y)
     while (hit != 'y' && hit != 'n')
     {
 	    printf("Wenst U een nieuw kaart te hitten? Y of N \n");
 	    scanf("%c", &hit);
         result = tolower(hit);
+        printf("result is %c", result);
+            if (result == 'y')
+            {
+               giveMe = 1; 
+            }
+            else
+            {
+                giveMe = 0;
+            }
+            
+
+        kpSpeler = kpSpeler + kaartBij(giveMe);
+        printf("\nHandwaarde SPELER = %d\n", kpSpeler);
+
+        if (kpHouse <17)
+    {
+        kpHouse = kpHouse + kaartBijHouse(giveMe);
+//        printf("\nHandwaarde HOUSE = %d\n", kpHouse);
+    } else if (kpHouse < 22)
+    {
+        printf("\nHOUSE past met %d\n", kpHouse);
+    }
+ 
+    checkHandWaarde(kpSpeler, kpHouse);
 	}
+
+
+
+
+
+        
+
+}
+
+//controle op waarden in hand tussen speler & House
+int checkHandWaarde(int kpSpeler, int kpHouse)
+{
+    if (kpSpeler > kpHouse && kpSpeler < 22 && kpHouse > 16)
+    {
+        gewonnen();
+        return 0;
+    }
+    else if (kpSpeler <22 && kpHouse > 21)
+    {
+        printf("\n*** HOUSE is BUST *** || ");
+        gewonnen();
+        return 0;
+    }
+    else if (kpSpeler > 21)
+    {
+        printf("\nU bent BUST ... !!! ");
+        verloren();
+        return 0;
+    }
+    else
+    {
+        printf("\nSPELER %d vs HOUSE %d\n", kpSpeler, kpHouse);
+    }
     
-    if (result == 'y')
+    return 0;
+}
+//kaart bij HOUSE
+int kaartBijHouse(int puntTotaal)
+{
+    if (puntTotaal < 18)
+    {
+        puntTotaal = deelNieuweKaart();
+    }
+    else if (puntTotaal > 21)
+    {
+        printf("*** HOUSE is BUST *** || ");
+        gewonnen();
+    } else
+    {
+        printf("HOUSE PAST \n");
+    }
+     
+    return puntTotaal;
+}
+
+//kaart bijvragen
+int kaartBij(int puntTotaal, int giveMe)
+{
+    
+    if (giveMe == 1)
     {
        puntTotaal = deelNieuweKaart();   
     }
-    else if (result == 'n')
+    else if (giveMe == 0)
     {
         //code verder schrijven
     }
@@ -167,10 +248,9 @@ int puntTotaal = 0;
 }
 
 // deelt startkaarten
-int deelStartKaarten()
+int deelStartKaarten(int puntTotaal)
 {
 int punt = 0;
-int puntTotaal = 0;	
     for(int i = 0; i < 2; i++)
 	{
 		punt = geefKaart();
@@ -178,7 +258,7 @@ int puntTotaal = 0;
         if (punt == 1)  {
             punt = waardeAas(punt, puntTotaal);}      
 
-        printf("waarde kaart: %d \n", punt);
+//        printf("waarde kaart: %d \n", punt);
         puntTotaal = puntTotaal + punt;
 	}
     return puntTotaal;
