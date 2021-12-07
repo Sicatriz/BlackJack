@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <ctype.h>
 
 int geefKaart();
 int kaart1();
@@ -29,6 +30,10 @@ void printIntro(void);
 int deelStartKaarten();
 int waardeAas();
 int blackJack();
+int kaartBij();
+int deelNieuweKaart();
+void gewonnen();
+void verloren();
 
 int main(void)
 {
@@ -55,46 +60,110 @@ int actief = 0;
     //speler krijgt starthand en print punten.
     kpSpeler = deelStartKaarten();
     printf("\nHandwaarde SPELER = %d\n", kpSpeler);
-        if (kpSpeler == 21)
-        {
-            actief = 1;
-            blackJack(actief);
-            printf("actief = %d", actief);
-        }
 
     //House krijgt starthand en print punten.
     kpHouse = deelStartKaarten();
     printf("\nHandwaarde HOUSE = %d\n", kpHouse);
-        if (kpHouse == 21)
+
+        //controle op Blackjacks
+        if (kpSpeler == 21)
+        {
+            actief = 1;
+            actief = blackJack(actief);
+        }
+        else if (kpHouse == 21)
         {
             actief = 2;
-            blackJack(actief);
-            printf("actief = %d", actief);
+            actief = blackJack(actief);
+            printf("actief = %d\n", actief);
         }
-
+        else
+        {
+                //kaart bijvragen of niet.
+                kpSpeler = kpSpeler + kaartBij();
+                printf("\nHandwaarde SPELER = %d\n", kpSpeler);
+        }
 
 }
 
+//kaart bijvragen
+int kaartBij(int puntTotaal)
+{
+char hit = 'x';
+char result = 'x';
 
+    while (hit != 'y' && hit != 'n')
+    {
+	    printf("Wenst U een nieuw kaart te hitten? Y of N \n");
+	    scanf("%c", &hit);
+        result = tolower(hit);
+	}
+    
+    if (result == 'y')
+    {
+       puntTotaal = deelNieuweKaart();   
+    }
+    else if (result == 'n')
+    {
+        //code verder schrijven
+    }
+    else
+    {
+        printf("U heeft een ongeldig karakter ingegeven.");
+    }  
+    return puntTotaal;
+}
 
 //Hand maakt blackjack
-int blackJack(actief)
+int blackJack(int actief)
 {
     switch (actief)
     {
     case 1:
-        printf("BLACKJACK!!! U heeft GEWONNEN!!!");
+        printf("*** BLACKJACK !!! *** || ");
+        gewonnen();
         break;
 
     case 2:
-        printf("HOUSE heeft blackjack, U heeft VERLOREN...");
+        printf("HOUSE heeft BLACKJACK ... ");
+        verloren();
         break;
     
     default:
         printf("Er is geen actieve speler ...");
         break;
     }
+
     return 0;
+}
+
+//tekst bij winst
+void gewonnen()
+{
+    printf("U heeft GEWONNEN !!!\n");
+}
+
+//tekst bij verlies
+void verloren()
+{
+    printf("U heeft VERLOREN... !!!\n");
+}
+
+// deel nieuwe kaart
+int deelNieuweKaart()
+{
+int punt = 0;
+int puntTotaal = 0;	
+
+	punt = geefKaart();
+
+    if (punt == 1)  {
+        punt = waardeAas(punt, puntTotaal);}      
+
+    printf("waarde kaart: %d \n", punt);
+    puntTotaal = puntTotaal + punt;
+
+    return puntTotaal;
 }
 
 // deelt startkaarten
