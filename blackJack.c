@@ -28,6 +28,7 @@ int randomKaart();
 void printIntro(void);
 int deelStartKaarten();
 int waardeAas();
+int blackJack();
 
 int main(void)
 {
@@ -35,6 +36,8 @@ int main(void)
 char voorNaam[20];
 int kpSpeler = 0;
 int kpHouse = 0;
+// actief 0 = neutraal, actief 1 = SPELER, actief 2 = HOUSE
+int actief = 0;
 
 	srand(time(NULL));
 
@@ -50,15 +53,43 @@ int kpHouse = 0;
     printf("Dag %s , succes met het spel!.\n\n Uw starthand is : \n\n", voorNaam);
 
     //speler krijgt starthand en print punten.
-    kpSpeler = deelStartKaarten(kpSpeler);
+    kpSpeler = deelStartKaarten();
     printf("\nHandwaarde SPELER = %d\n", kpSpeler);
+    if (kpSpeler == 21)
+    {
+        actief = 1;
+        blackJack(actief);
+    }
+    
+
+
 
     //House krijgt starthand en print punten.
-    kpHouse = deelStartKaarten(kpHouse);
-    printf("\nHandwaarde SPELER = %d\n", kpHouse);
+    kpHouse = deelStartKaarten();
+    printf("\nHandwaarde HOUSE = %d\n", kpHouse);
 
 
 }
+
+//Hand maakt blackjack
+int blackJack(actief)
+{
+    switch (actief)
+    {
+    case 1:
+        printf("BLACKJACK!!! U heeft GEWONNEN!!!");
+        break;
+
+     case 2:
+        printf("HOUSE heeft blackjack, U heeft VERLOREN...");
+        break;
+    
+    default:
+        printf("Er is geen actieve speler ...");
+        break;
+    }
+}
+
 // deelt startkaarten
 int deelStartKaarten()
 {
