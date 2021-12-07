@@ -89,14 +89,12 @@ int giveMe = 2;
             return 0;
         }
                 
-
     //kaart bijvragen of niet. (giveMe 0 = N ||  giveMe 1 = Y)
     while (hit != 'y' && hit != 'n')
     {
 	    printf("Wenst U een nieuw kaart te hitten? Y of N \n");
 	    scanf("%c", &hit);
         result = tolower(hit);
-        printf("result is %c", result);
             if (result == 'y')
             {
                giveMe = 1; 
@@ -104,26 +102,22 @@ int giveMe = 2;
             else
             {
                 giveMe = 0;
-            }
-            
+            }   
 
-        kpSpeler = kpSpeler + kaartBij(giveMe);
+        kpSpeler = kpSpeler + kaartBij(kpSpeler, giveMe);
         printf("\nHandwaarde SPELER = %d\n", kpSpeler);
 
-        if (kpHouse <17)
-    {
-        kpHouse = kpHouse + kaartBijHouse(giveMe);
+            if (kpHouse <17)
+        {
+            kpHouse = kpHouse + kaartBijHouse(kpHouse, giveMe);
 //        printf("\nHandwaarde HOUSE = %d\n", kpHouse);
-    } else if (kpHouse < 22)
-    {
-        printf("\nHOUSE past met %d\n", kpHouse);
-    }
+        } else if (kpHouse < 22)
+        {
+            printf("\nHOUSE past met %d\n", kpHouse);
+        }   
  
-    checkHandWaarde(kpSpeler, kpHouse);
+        checkHandWaarde(kpSpeler, kpHouse);
 	}
-
-
-
 
 
         
@@ -179,7 +173,6 @@ int kaartBijHouse(int puntTotaal)
 //kaart bijvragen
 int kaartBij(int puntTotaal, int giveMe)
 {
-    
     if (giveMe == 1)
     {
        puntTotaal = deelNieuweKaart();   
